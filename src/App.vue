@@ -9,7 +9,9 @@
       placeholder="search todos"
     />
 
-    <button @click="getChecked">{{ checkedValue }} todos</button>
+    <button ref="checkedButton" @click="toggleChecked">
+      {{ checkedValue }} todos
+    </button>
 
     <input
       ref="newTodo"
@@ -22,8 +24,28 @@
   </header>
 
   <main>
-    <ul v-if="filteredTodos.length">
+    <ul v-if="filteredTodos.length && !checked">
       <li v-for="todo in filteredTodos" :key="todo.id">
+        <span :class="{ done: todo.done }" @click="toggleDone(todo)">{{
+          todo.title
+        }}</span>
+        <div class="btns-wrapper">
+          <span ref="timer" class="timer">00:00:00</span>
+          <button @click="startTimer">start</button>
+          <button @click="stopTimer">stop</button>
+          <button>pause</button>
+          <button class="delete" @click="deleteTodo(todo.id)">
+            Delete Todo
+          </button>
+          <button class="update" @click="updateTodo(todo.id)">
+            Update Todo
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <ul v-if="checked">
+      <li v-for="todo in checkedTodos" :key="todo.id">
         <span :class="{ done: todo.done }" @click="toggleDone(todo)">{{
           todo.title
         }}</span>
@@ -41,7 +63,11 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
+
+onMounted(() => {
+  newTodo.value.focus();
+});
 
 const state = reactive({
   newTodo: "",
@@ -53,6 +79,8 @@ const checked = ref(false);
 const addBtn = ref("add");
 const newTodo = ref("");
 const targetId = ref(null);
+const time = ref(0);
+const timer = ref("");
 
 const addNewTodo = () => {
   if (state.newTodo && addBtn.value.innerText === "add") {
@@ -101,14 +129,17 @@ const filteredTodos = computed(() => {
   }
 });
 
-const getChecked = () => {
-  if (checked.value) {
-    state.todos = state.todos.filter((todo) => todo);
-  } else {
-    state.todos = state.todos.filter((todo) => todo.done);
-  }
+const toggleChecked = () => {
   checked.value = !checked.value;
 };
+
+const checkedTodos = computed(() => {
+  if (checked.value) {
+    return state.todos.filter((todo) => todo.done);
+  } else {
+    return state.todos;
+  }
+});
 
 const checkedValue = computed(() => {
   return checked.value ? "all" : "checked";
@@ -119,13 +150,23 @@ const sortTodos = () => {
 };
 
 function ascendingSort(a, b) {
-  if (a.title < b.title) {
+  if (a.title.toLowerCase() < b.title.toLowerCase()) {
     return -1;
   }
-  if (b.title > a.title) {
+  if (b.title.toLowerCase() > a.title.toLowerCase()) {
     return 1;
   }
   return 0;
+}
+const startTimer = () => {
+  setInterval(() => {
+    time.value++;
+    timer.value[0].innerText = time.value;
+  }, 100);
+};
+
+const stopTimer = ()=>{
+
 }
 </script>
 
@@ -197,6 +238,8 @@ ul li:hover {
 
 .btns-wrapper {
   display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .delete,
