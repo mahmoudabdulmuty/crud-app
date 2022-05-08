@@ -181,6 +181,11 @@ const timerFunction = (action) => {
     pause.value[0].disabled = false;
   } else if (action === "pause") {
     clearInterval(interval.value);
+  } else if (action === "stop") {
+    clearInterval(interval.value);
+    timer.value[0].innerText = 0;
+    stop.value[0].disabled = true;
+    pause.value[0].disabled = true;
   }
 };
 </script>
