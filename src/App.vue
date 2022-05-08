@@ -170,22 +170,36 @@ function ascendingSort(a, b) {
 function startTimer() {
   interval.value = setInterval(() => {
     time.value++;
-    timer.value[0].innerText = time.value;
+    let mins = Math.floor(time.value / 10 / 60) % 60;
+    let secs = Math.floor(time.value / 10) % 60;
+    let tenths = time.value % 10;
+    if (mins < 10) {
+      mins = "0" + mins;
+    }
+    if (secs < 10) {
+      secs = "0" + secs;
+    }
+    timer.value[0].innerText = mins + ":" + secs + ":" + "0" + tenths;
   }, 100);
 }
 
 const timerFunction = (action) => {
   if (action === "start") {
     startTimer();
+    start.value[0].disabled = true;
     stop.value[0].disabled = false;
     pause.value[0].disabled = false;
   } else if (action === "pause") {
     clearInterval(interval.value);
+    stop.value[0].disabled = false;
+    start.value[0].disabled = false;
   } else if (action === "stop") {
     clearInterval(interval.value);
-    timer.value[0].innerText = 0;
     stop.value[0].disabled = true;
     pause.value[0].disabled = true;
+    start.value[0].disabled = false;
+    timer.value[0].innerText = `00:00:00`
+    time.value = 0;
   }
 };
 </script>
