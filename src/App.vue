@@ -11,21 +11,30 @@
 
     <button @click="getChecked">{{ checkedValue }} todos</button>
 
-    <input type="text" v-model="state.newTodo" placeholder="add a new todo" />
-    <button @click="addNewTodo">add</button>
+    <input
+      ref="newTodo"
+      type="text"
+      v-model="state.newTodo"
+      placeholder="add a new todo"
+    />
+    <button ref="addBtn" @click="addNewTodo">add</button>
     <button @click="sortTodos">sort</button>
   </header>
 
-  <main class="todos-wrapper">
+  <main>
     <ul v-if="filteredTodos.length">
-      <li
-        :class="{ done: todo.done }"
-        v-for="todo in filteredTodos"
-        :key="todo.id"
-        @click="toggleDone(todo)"
-      >
-        <span>{{ todo.title }}</span>
-        <button class="delete" @click="deleteTodo(todo.id)">Delete Todo</button>
+      <li v-for="todo in filteredTodos" :key="todo.id">
+        <span :class="{ done: todo.done }" @click="toggleDone(todo)">{{
+          todo.title
+        }}</span>
+        <div class="btns-wrapper">
+          <button class="delete" @click="deleteTodo(todo.id)">
+            Delete Todo
+          </button>
+          <button class="update" @click="updateTodo(todo.id)">
+            Update Todo
+          </button>
+        </div>
       </li>
     </ul>
   </main>
@@ -41,18 +50,24 @@ const state = reactive({
 
 const searchQuery = ref("");
 const checked = ref(false);
+const addBtn = ref("add");
+const newTodo = ref("");
 
 const addNewTodo = () => {
-  if (state.newTodo) {
+  if (state.newTodo && addBtn.value.innerText === "add") {
     state.todos.push({
       title: state.newTodo,
       done: false,
       id: Math.random(),
     });
-  } else {
+    state.newTodo = "";
+  } else if (!state.newTodo) {
     alert("you must type something");
+  } else if (addBtn.value.innerText === "update") {
+    console.log(newTodo.value.value);
+    // state.newTodo = "";
+    // addBtn.value.innerText = "add";
   }
-  state.newTodo = "";
 };
 
 const toggleDone = (todo) => {
@@ -61,6 +76,13 @@ const toggleDone = (todo) => {
 
 const deleteTodo = (id) => {
   state.todos = state.todos.filter((todo) => todo.id !== id);
+};
+
+const updateTodo = (id) => {
+  const targetTodo = state.todos.find((todo) => todo.id === id);
+  state.newTodo = targetTodo.title;
+  targetTodo.value = targetTodo.title;
+  addBtn.value.innerText = "update";
 };
 
 const filteredTodos = computed(() => {
@@ -138,7 +160,7 @@ h1 {
   cursor: pointer;
   color: #555;
   background: #d9d9d9;
-  transition: 0.3;
+  transition: 0.3s;
   border: none;
   width: 12%;
   border-radius: 6px;
@@ -167,11 +189,16 @@ ul li:hover {
   background: #ddd;
 }
 
-.delete.delete {
+.btns-wrapper {
+  display: flex;
+}
+
+.delete,
+.update {
   padding: 12px 16px 12px 16px;
 }
 
-.done span {
+.done {
   text-decoration: line-through;
 }
 </style>
