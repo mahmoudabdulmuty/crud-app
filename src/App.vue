@@ -198,7 +198,7 @@ const timerFunction = (action) => {
     stop.value[0].disabled = true;
     pause.value[0].disabled = true;
     start.value[0].disabled = false;
-    timer.value[0].innerText = `00:00:00`
+    timer.value[0].innerText = `00:00:00`;
     time.value = 0;
   }
 };
