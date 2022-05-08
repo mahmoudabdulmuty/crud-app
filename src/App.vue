@@ -52,6 +52,7 @@ const searchQuery = ref("");
 const checked = ref(false);
 const addBtn = ref("add");
 const newTodo = ref("");
+const targetId = ref(null);
 
 const addNewTodo = () => {
   if (state.newTodo && addBtn.value.innerText === "add") {
@@ -64,9 +65,13 @@ const addNewTodo = () => {
   } else if (!state.newTodo) {
     alert("you must type something");
   } else if (addBtn.value.innerText === "update") {
-    console.log(newTodo.value.value);
-    // state.newTodo = "";
-    // addBtn.value.innerText = "add";
+    state.todos.forEach((todo) => {
+      if (todo.id === targetId.value) {
+        todo.title = newTodo.value.value;
+        state.newTodo = "";
+        addBtn.value.innerText = "add";
+      }
+    });
   }
 };
 
@@ -82,6 +87,7 @@ const updateTodo = (id) => {
   const targetTodo = state.todos.find((todo) => todo.id === id);
   state.newTodo = targetTodo.title;
   targetTodo.value = targetTodo.title;
+  targetId.value = id;
   addBtn.value.innerText = "update";
 };
 
