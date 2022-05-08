@@ -31,9 +31,13 @@
         }}</span>
         <div class="btns-wrapper">
           <span ref="timer" class="timer">00:00:00</span>
-          <button @click="startTimer">start</button>
-          <button @click="stopTimer">stop</button>
-          <button>pause</button>
+          <button ref="start" @click="timerFunction('start')">start</button>
+          <button disabled ref="stop" @click="timerFunction('stop')">
+            stop
+          </button>
+          <button disabled @click="timerFunction('pause')" ref="pause">
+            pause
+          </button>
           <button class="delete" @click="deleteTodo(todo.id)">
             Delete Todo
           </button>
@@ -81,6 +85,10 @@ const newTodo = ref("");
 const targetId = ref(null);
 const time = ref(0);
 const timer = ref("");
+const start = ref(null);
+const stop = ref(null);
+const pause = ref(null);
+const interval = ref(null);
 
 const addNewTodo = () => {
   if (state.newTodo && addBtn.value.innerText === "add") {
@@ -158,16 +166,23 @@ function ascendingSort(a, b) {
   }
   return 0;
 }
-const startTimer = () => {
-  setInterval(() => {
+
+function startTimer() {
+  interval.value = setInterval(() => {
     time.value++;
     timer.value[0].innerText = time.value;
   }, 100);
-};
-
-const stopTimer = ()=>{
-
 }
+
+const timerFunction = (action) => {
+  if (action === "start") {
+    startTimer();
+    stop.value[0].disabled = false;
+    pause.value[0].disabled = false;
+  } else if (action === "pause") {
+    clearInterval(interval.value);
+  }
+};
 </script>
 
 <style>
