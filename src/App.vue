@@ -9,7 +9,7 @@
       placeholder="search todos"
     />
 
-    <button ref="checkedButton" @click="toggleChecked">
+    <button v-if="isCheckButtonVisible" @click="toggleChecked">
       {{ checkedValue }} todos
     </button>
 
@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 
 onMounted(() => {
   newTodo.value.focus();
@@ -80,6 +80,7 @@ const state = reactive({
 
 const searchQuery = ref("");
 const checked = ref(false);
+const isCheckButtonVisible = ref(false);
 const addBtn = ref("add");
 const newTodo = ref("");
 const targetId = ref(null);
@@ -151,6 +152,14 @@ const checkedTodos = computed(() => {
 
 const checkedValue = computed(() => {
   return checked.value ? "all" : "checked";
+});
+
+watch(state.todos, () => {
+  state.todos.forEach((todo) => {
+    if (todo.done) {
+      isCheckButtonVisible.value = true;
+    }
+  });
 });
 
 const sortTodos = () => {
